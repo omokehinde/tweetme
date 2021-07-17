@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row text-center">
+        <div class="col">
+            <h1>Welcome to tweetme</h1>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4 mx-auto col-10">
+            <form method="POST" action="/create-tweet" class="form">
+                {% csrf_token %}
+                <input type="hidden" value="/" name="next" />
+                <textarea required="required" name="content" placeholder="Your tweet..." class="form-control mb-2"></textarea>
+                <button type="submit" class="btn btn-primary">Tweet</button>
+            </form>
+        </div>
+    </div>
+
+  <div id="tweets"></div>
+  <script>
+      const xhr = new XMLHttpRequest();
+      const method = 'GET';
+      const url = '/tweets';
+      const responseType = 'json'
+
+      xhr.responseType = responseType;
+      xhr.open(method, url);
+      xhr.onload = function() {
+          console.log(xhr.response);
+          const serverResponse = xhr.response;
+          let listedItems = serverResponse.response;
+          console.log(listedItems);
+          let tweets = document.getElementById('tweets');
+          listedItems.forEach(tweet => {
+              tweets.innerHTML = '<h1>' + tweet.id + ' ' + tweet.content + '<h1>';
+          });
+      };
+      xhr.send();
+  </script>
+{% endblock content %}
