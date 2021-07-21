@@ -22,8 +22,13 @@ class Tweet(models.Model):
     class Meta:
         ordering = ['-id']
 
+    @property
+    def is_retweet(self):
+        return self.parent != None
+
     def serialize(self):
         """
+        Method not required if you are using DRF serializer
         Serialize Tweet
         """
         return {
