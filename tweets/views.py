@@ -98,25 +98,24 @@ def tweet_action_view(request, *args, **kwargs):
         tweet_id = data.get('id')
         action = data.get('action')
         content = data.get('content')
-    qs = Tweet.objects.filter(id=tweet_id)
-    if not qs.exists:
-        return Response({}, status=404)
-    qs = qs.filter(user=request.user)
-    if not qs.exists():
-        return Response({'Tweet does not exist'}, status=404)
-    obj = qs.first()
-    if action == 'like':
-        obj.likes.add(request.user)
-        serializer = TweetActionSerializer(obj)
-        return Response(serializer.data, status=200)
-    elif action == 'unlike':
-        obj.likes.remove(request.user)
-    elif action == 'retweet':
-        new_tweet = Tweet.objects.create(
-            user=request.user, 
-            parent=obj, content=content)
-        serializer = TweetSerializer(new_tweet)
-        return Response(serializer.data, status=201)
+        qs = Tweet.objects.filter(id=tweet_id)
+        if not qs.exists:
+            return Response({'message':'Tweet not found'}, status=404)
+        obj = qs.first()
+        if action == 'like':
+            obj.likes.add(request.user)
+            serializer = TweetSerializer(obj)
+            return Response(serializer.data, status=200)
+        elif action == 'unlike':
+            obj.likes.remove(request.user)
+            serializer = TweetSerializer(obj)
+            return Response(serializer.data, status=200)
+        elif action == 'retweet':
+            new_tweet = Tweet.objects.create(
+                user=request.user, 
+                parent=obj, content=content)
+            serializer = TweetSerializer(new_tweet)
+            return Response(serializer.data, status=201)
     return Response({}, status=200)
 
 @api_view(['DELETE', 'POST'])
@@ -131,7 +130,7 @@ def tweet_delete_view(request,tweet_id, *args, **kwargs):
         return Response({}, status=404)
     qs = qs.filter(user=request.user)
     if not qs.exists():
-        return Response({'message':'You cannot delete this tweet'}, status=401)
+        return Response({'message':'You cannot delete this tweet'}, status=403)
     obj = qs.first()
     obj.delete()
     return Response({'message': 'Tweet deleted'}, status=200)

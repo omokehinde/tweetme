@@ -36,7 +36,7 @@ class TweetSerializer(serializers.ModelSerializer):
     parent = TweetCreateSerializer(read_only=True)
     class Meta:
         model = Tweet
-        fields = ['id', 'content', 'likes', 'is_retweet']
+        fields = ['id', 'content', 'likes', 'parent','is_retweet']
     
     def get_likes(self, obj):
         return obj.likes.count()
