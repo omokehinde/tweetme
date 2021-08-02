@@ -4,16 +4,24 @@ import { loadTweets } from "../lookup";
 
 function ActionBtn(props) {
     const {tweet, action} = props;
+    const [likes, setLikes] = useState(tweet.likes ? tweet.likes : 0);
+    const [userLike, setUserLike] = useState(false);
     const className = props.className ? className : 'btn btn-primary btn-sm';
     const actionDisplay = action.display ? action.display : 'Action';
     const plural = tweet.likes > 1 ? 's' : '';
-    const display = action.type === 'like' ? `${tweet.likes} ${actionDisplay}`+ plural  : actionDisplay;
     const hamdleClick = (event) => {
         event.preventDefault();
         if (action.type==='like') {
-            console.log(tweet.likes+1);
+            if (userLike===true) {
+                setLikes(likes-1);
+                setUserLike(false);
+            } else {
+                setLikes(likes+1);
+                setUserLike(true);
+            }
         }
     };
+    const display = action.type === 'like' ? `${likes} ${actionDisplay}`+ plural  : actionDisplay;
     return <button className={className} onClick={hamdleClick}>{display}</button>;
   }
   
@@ -24,7 +32,6 @@ function ActionBtn(props) {
       <p>{tweet.id} - {tweet.content}</p>
       <div className='btn btn-group'>
         <ActionBtn tweet={tweet} action={{type: 'like', display:'Like'}} />
-        <ActionBtn tweet={tweet} action={{type: 'unlike', display:'Unlike'}} />
         <ActionBtn tweet={tweet} action={{type: 'retweet', display:'Retweet'}} />
       </div>
     </div>
