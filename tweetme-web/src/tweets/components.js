@@ -4,12 +4,17 @@ import { loadTweets } from "../lookup";
 
 function ActionBtn(props) {
     const {tweet, action} = props;
-    const className = props.className ? className : 'btn btn-primary btn-sm'
-    if (action.type==='like') {
-     return <button className={className} >
-       {tweet.likes} {tweet.likes > 1 ? 'Likes' : 'Like'}
-      </button>
-    }
+    const className = props.className ? className : 'btn btn-primary btn-sm';
+    const actionDisplay = action.display ? action.display : 'Action';
+    const plural = tweet.likes > 1 ? 's' : '';
+    const display = action.type === 'like' ? `${tweet.likes} ${actionDisplay}`+ plural  : actionDisplay;
+    const hamdleClick = (event) => {
+        event.preventDefault();
+        if (action.type==='like') {
+            console.log(tweet.likes+1);
+        }
+    };
+    return <button className={className} onClick={hamdleClick}>{display}</button>;
   }
   
   function Tweet(props) {
@@ -18,7 +23,9 @@ function ActionBtn(props) {
     return <div className={className} >
       <p>{tweet.id} - {tweet.content}</p>
       <div className='btn btn-group'>
-        <ActionBtn tweet={tweet} action={{type: 'like'}} />
+        <ActionBtn tweet={tweet} action={{type: 'like', display:'Like'}} />
+        <ActionBtn tweet={tweet} action={{type: 'unlike', display:'Unlike'}} />
+        <ActionBtn tweet={tweet} action={{type: 'retweet', display:'Retweet'}} />
       </div>
     </div>
   }
