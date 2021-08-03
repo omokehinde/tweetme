@@ -1,5 +1,6 @@
-import { TweetList } from "./components";
+import { TweetList, TweetsComponent } from "./components";
 
 export {
-    TweetList
+    TweetList,
+    TweetsComponent
 }
