@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { loadTweets } from "../lookup";
+import { loadTweets, createTweet } from "../lookup";
 
 export function TweetsComponent(props) {
     const textAreaRef = React.createRef();
@@ -10,10 +10,14 @@ export function TweetsComponent(props) {
         const newVal = textAreaRef.current.value;
         let tempNewTweets = [...newTweet];
         // chamge this to a sever side call
-        tempNewTweets.unshift({
-            content: newVal,
-            likes: 0,
-            id: 22
+        createTweet(newVal, (response, status)=>{
+            if (status===201) {
+                console.log(newVal);
+                tempNewTweets.unshift(response);
+            } else {
+                console.log(response);
+                alert(response.detail);
+            }
         });
         setNewTweet(tempNewTweets);
         textAreaRef.current.value = '';
@@ -62,12 +66,12 @@ function ActionBtn(props) {
         <ActionBtn tweet={tweet} action={{type: 'retweet', display:'Retweet'}} />
       </div>
     </div>
-  }
+}
   
-  export function TweetList(props) {
+export function TweetList(props) {
     const [tweetsInit, setTweetsInit] = useState([]);
     const [tweets, setTweets] = useState([]);
-    // setTweetsInit([...props.newTweet].concat(tweetsInit));
+    const [tweetsDidSet, setTweetsDidSet] = useState(false);
     useEffect(()=>{
         const final = [...props.newTweet].concat(tweetsInit);
         if (final.length!==tweets.length) {
@@ -75,15 +79,17 @@ function ActionBtn(props) {
         }
     }, [props.newTweet, tweets, tweetsInit]);
     useEffect(()=>{
-      // perform lookup
-      const myCallback = (response, status)=>{
-        console.log(response, status);
-        if (status===200) {
-          setTweetsInit(response);
-        } else alert('An error occured')
-      };
-      loadTweets(myCallback);
-    }, []);
+      if (tweetsDidSet===false) {
+        const myCallback = (response, status)=>{
+            // console.log(response, status);
+            if (status===200) {
+                setTweetsInit(response);
+                setTweetsDidSet(true);
+            } else alert('An error occured')
+          };
+          loadTweets(myCallback);
+      }
+    }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
     return <div>
           {tweets.map((tweet, index)=>{
             return <Tweet tweet={tweet} key={`${index}-{tweet-id}`} className='my-5 mx-5 border' />
