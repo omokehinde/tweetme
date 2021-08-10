@@ -5,21 +5,21 @@ import { loadTweets, createTweet } from "../lookup";
 export function TweetsComponent(props) {
     const textAreaRef = React.createRef();
     const [newTweet, setNewTweet] = useState([]);
+    const handleBackendUpdate = (response, status) => {
+        // backend API response handler
+        let tempNewTweets = [...newTweet];
+        if (status===201) {
+            setNewTweet(tempNewTweets);
+            tempNewTweets.unshift(response);
+        } else {
+            alert(response.detail);
+        }
+    };
     const handleSubmit = (event) => {
         event.preventDefault();
         const newVal = textAreaRef.current.value;
-        let tempNewTweets = [...newTweet];
-        // chamge this to a sever side call
-        createTweet(newVal, (response, status)=>{
-            if (status===201) {
-                console.log(newVal);
-                tempNewTweets.unshift(response);
-            } else {
-                console.log(response);
-                alert(response.detail);
-            }
-        });
-        setNewTweet(tempNewTweets);
+        // backend api request
+        createTweet(newVal, handleBackendUpdate);
         textAreaRef.current.value = '';
     };
     return  <div className={props.className}>
