@@ -47,15 +47,15 @@ function ActionBtn(props) {
         if (status===200) {
             setLikes(response.likes);
             // setUserLike(true);
-            // tweetLiked = !tweetLiked;
         }
     }
-    const hamdleClick = (event) => {
+    const handleClick = (event) => {
         event.preventDefault();
+        tweetLiked = !tweetLiked;
         apiTweetAction(tweet.id, action.type, handleBackendActionEvent);
     };
     const display = action.type === 'like' || 'unlike' ? `${likes} ${actionDisplay}`+ plural  : actionDisplay;
-    return <button className={className} onClick={hamdleClick}>{display}</button>;
+    return <button className={className} onClick={handleClick}>{display}</button>;
   }
   
   function Tweet(props) {
