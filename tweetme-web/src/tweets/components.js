@@ -54,22 +54,35 @@ function ActionBtn(props) {
         tweetLiked = !tweetLiked;
         apiTweetAction(tweet.id, action.type, handleBackendActionEvent);
     };
-    const display = action.type === 'like' || 'unlike' ? `${likes} ${actionDisplay}`+ plural  : actionDisplay;
+    const display = action.type === 'like' ? `${likes} ${actionDisplay}`+ plural  : actionDisplay;
     return <button className={className} onClick={handleClick}>{display}</button>;
+  }
+
+export function ParentTweet(props) {
+    const {tweet} = props;
+      return tweet.parent ? <div className='row'>
+      <div className='col-11 mx-auto p-3 border rounded'>
+      <p className='mb-0 text-muted small'>Retweet</p>
+      <Tweet className={''} tweet={tweet.parent} />
+      </div>
+      </div> : null;
   }
   
   function Tweet(props) {
     const {tweet} = props;
     const className = props.className ? props.className : 'col-10 mx-auto col-md-6';
     return <div className={className} >
-      <p>{tweet.id} - {tweet.content}</p>
-      <div className='btn btn-group'>
-        {/* <ActionBtn tweet={tweet} action={{type: tweetLiked ? 'unlike' : 'like', display:'Like'}} /> */}
-        <ActionBtn tweet={tweet} action={{type: 'like', display:'Like'}} />
-        <ActionBtn tweet={tweet} action={{type: 'unlike', display:'Unlike'}} />
-        <ActionBtn tweet={tweet} action={{type: 'retweet', display:'Retweet'}} />
-      </div>
-    </div>
+        <div>
+            <p>{tweet.id} - {tweet.content}</p>
+            <ParentTweet tweet={tweet} />
+        </div>
+        <div className='btn btn-group'>
+            {/* <ActionBtn tweet={tweet} action={{type: tweetLiked ? 'unlike' : 'like', display:'Like'}} /> */}
+            <ActionBtn tweet={tweet} action={{type: 'like', display:'Like'}} />
+            <ActionBtn tweet={tweet} action={{type: 'unlike', display:'Unlike'}} />
+            <ActionBtn tweet={tweet} action={{type: 'retweet', display:'Retweet'}} />
+        </div>
+        </div>
 }
   
 export function TweetList(props) {
