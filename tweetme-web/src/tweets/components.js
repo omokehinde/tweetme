@@ -58,20 +58,22 @@ export function ParentTweet(props) {
       return tweet.parent ? <div className='row'>
       <div className='col-11 mx-auto p-3 border rounded'>
       <p className='mb-0 text-muted small'>Retweet</p>
-      <Tweet className={''} tweet={tweet.parent} />
+      <Tweet hideActions className={''} tweet={tweet.parent} />
       </div>
       </div> : null;
   }
   
 function Tweet(props) {
-    const {tweet} = props;
+    const {tweet, didRetweet, hideActions} = props;
     const [actionTweet, setActionTweet] = useState(props.tweet ? props.tweet : null);
     const className = props.className ? props.className : 'col-10 mx-auto col-md-6';
     const handlePerformAction = (newTweetAction, status) => {
         if (status===200) {   
             setActionTweet(newTweetAction);
         } else if (status==201) {
-            // let the tweet list know.
+            if (didRetweet) {
+                didRetweet(newTweetAction);
+            }
         }
     };
     return <div className={className} >
@@ -79,7 +81,7 @@ function Tweet(props) {
             <p>{tweet.id} - {tweet.content}</p>
             <ParentTweet tweet={tweet} />
         </div>
-        {actionTweet && <div className='btn btn-group'>
+        {(actionTweet && hideActions !== true) && <div className='btn btn-group'>
             {/* <ActionBtn tweet={tweet} action={{type: tweetLiked ? 'unlike' : 'like', display:'Like'}} /> */}
             <ActionBtn tweet={actionTweet} didPerformAction={handlePerformAction} action={{type: 'like', display:'Like'}} />
             <ActionBtn tweet={actionTweet} didPerformAction={handlePerformAction} action={{type: 'unlike', display:'Unlike'}} />
@@ -110,9 +112,20 @@ export function TweetList(props) {
           apiTweetList(handleTweetListLookup);
       }
     }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
-    return <div>
-          {tweets.map((tweet, index)=>{
-            return <Tweet tweet={tweet} key={`${index}-{tweet-id}`} className='my-5 mx-5 border' />
-          })}
-        </div>
+
+    const handleDidRetweet = (newTweet) => {
+        const updateTweetsInit = [...tweetsInit];
+        updateTweetsInit.unshift(newTweet);
+        setTweetsInit(updateTweetsInit);
+        const updateFinalTweets = [...tweets];
+        updateFinalTweets.unshift(tweets);
+        setTweets(updateFinalTweets);
+    };
+    return tweets.map((tweet, index)=>{
+            return <Tweet 
+                        tweet={tweet} 
+                        key={`${index}-{tweet-id}`} 
+                        didRetweet={handleDidRetweet} 
+                        className='my-5 mx-5 border' />
+          })
   }
